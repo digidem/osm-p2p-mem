@@ -1,17 +1,12 @@
-var hyperlog = require('hyperlog')
+var kappa = require('kappa-core')
+var ram = require('random-access-memory')
 var memdb = require('memdb')
-var store = require('memory-chunk-store')
-var osmdb = require('osm-p2p-db')
+var Osm = require('kappa-osm')
 
 module.exports = function () {
-  var db = {
-    log: memdb(),
-    index: memdb()
-  }
-
-  return osmdb({
-    log: hyperlog(db.log, { valueEncoding: 'json' }),
-    db: db.index,
-    store: store(4096)
+  return Osm({
+    core: kappa(ram, { valueEncoding: 'json' }),
+    index: memdb(),
+    storage: function (name, cb) { cb(null, ram()) }
   })
 }
